@@ -5,9 +5,6 @@
  */
 
 const ALBUM_CONFIG = {
-  // Hasło zabezpieczające dostęp do albumu
-  password: "oliwka123",
-
   // Dane solenizanta i imprezy
   birthdayPerson: "Oliwka",
   age: "18",
@@ -16,23 +13,28 @@ const ALBUM_CONFIG = {
 
   /**
    * ============================================================================
-   * TELEDYSK / AFTERMOVIE Z IMPREZY (YOUTUBE / PLIK MP4 / DYSK GOOGLE)
+   * PROFILE DOSTĘPU: DWA HASŁA = DWA RÓŻNE TELEDYSKI
    * ============================================================================
-   * NAJLEPSZA OPCJA NA TELEFON (IPHONE & ANDROID) BEZ ŻADNYCH BŁĘDÓW:
-   * 1. YouTube jako film "Niepubliczny" (Unlisted):
-   *    -> Wrzucasz film na YouTube i zaznaczasz widoczność "Niepubliczny".
-   *    -> Nikt w internecie go nie znajdzie (brak w wyszukiwarce YouTube).
-   *    -> Na telefonie odtwarza się w 100% bezpośrednio na stronie w najwyższej jakości (do 4K)!
-   *    -> Wklejasz tutaj link: np. "https://www.youtube.com/watch?v=..." lub "https://youtu.be/..."
-   *
-   * 2. Plik wideo MP4 w folderze:
-   *    -> Wrzucasz plik wideo bezpośrednio do folderu ze stroną i wpisujesz: "teledysk.mp4"
-   *
-   * 3. Dysk Google:
-   *    -> Możesz wkleić link z Dysku, jednak telefony (zwłaszcza iPhone / Safari)
-   *       domyślnie blokują odtwarzanie z Dysku Google przez blokadę plików cookie ITP.
+   * Zdjęcia z folderu Google Drive są identyczne dla obu grup.
+   * W zależności od tego, które hasło wpisze gość, strona wyświetla inny film!
    */
-  videoUrl: "https://www.youtube.com/watch?v=okM6r9N6CjY",
+  accessProfiles: {
+    // 1. PROFIL DLA ZNAJOMYCH
+    friends: {
+      password: "oliwka123", // Hasło dla znajomych (wpisz jakie chcesz)
+      videoTitle: "Film z Osiemnastki",
+      videoSubtitle: "To była niezapomniana noc pełna energii i tańca!",
+      videoUrl: "https://www.youtube.com/watch?v=DdWRmEKqw1I" // Link do filmu dla znajomych (YouTube Unlisted / MP4)
+    },
+
+    // 2. PROFIL DLA RODZINY
+    family: {
+      password: "oliwka18", // Hasło dla rodziny (wpisz jakie chcesz)
+      videoTitle: "Film z Osiemnastki",
+      videoSubtitle: "To była niezapomniana noc pełna energii i tańca!",
+      videoUrl: "https://www.youtube.com/watch?v=qzTLU5eov2s" // Link do filmu dla rodziny (YouTube Unlisted / MP4)
+    }
+  },
 
   /**
    * ============================================================================

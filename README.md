@@ -31,11 +31,18 @@ Aby teledysk odtwarzał się **bezpośrednio na stronie na każdym telefonie (iP
 
 ---
 
-## 🔒 Zabezpieczenie hasłem
+## 🔒 Zabezpieczenie hasłem (Dwa profile: Znajomi vs Rodzina)
 
-- **Domyślne hasło:** `oliwka123`
-- Zdjęcia i film są ukryte do momentu podania hasła.
-- Hasło możesz zmienić w [**`config.js`**](config.js).
+Strona posiada inteligentny system dwóch profili z osobnymi hasłami i osobnymi filmami (przy zachowaniu tej samej galerii zdjęć):
+
+* **Dla Znajomych:**  
+  * Hasło: `oliwka-ekipa`  
+  * Teledysk: Wersja imprezowa dla znajomych  
+* **Dla Rodziny:**  
+  * Hasło: `oliwka-rodzina`  
+  * Teledysk: Wersja rodzinna / pamiątkowa  
+
+Hasła, tytuły oraz linki do obu filmów możesz w każdej chwili edytować w pliku [**`config.js`**](config.js) w sekcji `accessProfiles`.
 
 ---
 

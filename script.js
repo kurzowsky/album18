@@ -9,10 +9,12 @@ const State = {
   photos: [],
   currentPhotoIndex: 0,
   isLightboxOpen: false,
-  isAuthenticated: false
+  isAuthenticated: false,
+  activeProfile: 'friends' // 'friends' | 'family'
 };
 
 const STORAGE_KEY = 'album_18_auth_token';
+const PROFILE_KEY = 'album_18_active_profile';
 
 document.addEventListener('DOMContentLoaded', () => {
   initPasswordProtection();
@@ -20,9 +22,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /**
  * ==============================================================================
- * 1. ZABEZPIECZENIE HASŁEM (GATEKEEPER / LOCKSCREEN)
+ * 1. ZABEZPIECZENIE HASŁEM (GATEKEEPER / DWA PROFILE: ZNAJOMI VS RODZINA)
  * ==============================================================================
  */
+function resolvePasswordProfile(entered) {
+  if (!entered) return null;
+  const str = String(entered).trim();
+  const profiles = ALBUM_CONFIG.accessProfiles;
+
+  if (profiles) {
+    if (profiles.family && profiles.family.password && str === String(profiles.family.password).trim()) {
+      return 'family';
+    }
+    if (profiles.friends && profiles.friends.password && str === String(profiles.friends.password).trim()) {
+      return 'friends';
+    }
+  }
+
+  return null;
+}
+
 function initPasswordProtection() {
   const lockOverlay = document.getElementById('lockscreenOverlay');
   const passwordForm = document.getElementById('passwordForm');
@@ -39,7 +58,9 @@ function initPasswordProtection() {
 
   // Sprawdzamy, czy użytkownik podał już wcześniej prawidłowe hasło (zapamiętane w przeglądarce)
   const savedToken = localStorage.getItem(STORAGE_KEY);
-  if (savedToken && savedToken === ALBUM_CONFIG.password) {
+  const matchedProfile = resolvePasswordProfile(savedToken);
+  if (matchedProfile) {
+    State.activeProfile = matchedProfile;
     unlockAlbum(false); // Odblokowujemy bez ponownego wpisywania hasła
   } else {
     // Ustawiamy fokus na pole hasła
@@ -86,10 +107,12 @@ function verifyPassword() {
   if (!passwordInput) return;
 
   const entered = passwordInput.value.trim();
+  const matchedProfile = resolvePasswordProfile(entered);
 
-  // Weryfikacja hasła (zgodność z ALBUM_CONFIG.password)
-  if (entered === ALBUM_CONFIG.password) {
-    localStorage.setItem(STORAGE_KEY, ALBUM_CONFIG.password);
+  if (matchedProfile) {
+    State.activeProfile = matchedProfile;
+    localStorage.setItem(STORAGE_KEY, entered);
+    localStorage.setItem(PROFILE_KEY, matchedProfile);
     if (errorMsg) errorMsg.classList.remove('visible');
     unlockAlbum(true);
   } else {
@@ -129,7 +152,9 @@ function unlockAlbum(triggerConfetti = true) {
 
 function relockAlbum() {
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(PROFILE_KEY);
   State.isAuthenticated = false;
+  State.activeProfile = 'friends';
   document.body.classList.add('is-locked');
 
   const lockOverlay = document.getElementById('lockscreenOverlay');
@@ -314,9 +339,25 @@ function initVideoSection() {
 
   if (!section || !playerWrapper) return;
 
-  const rawUrl = (ALBUM_CONFIG.videoUrl || '').trim();
+  // Rozpoznanie aktywnego profilu (znajomi vs rodzina)
+  const profileKey = State.activeProfile || 'friends';
+  const profileConfig = (ALBUM_CONFIG.accessProfiles && ALBUM_CONFIG.accessProfiles[profileKey])
+    ? ALBUM_CONFIG.accessProfiles[profileKey]
+    : null;
 
-  // Jeśli brak linku do filmu, ukrywamy sekcję i przycisk w Hero
+  const rawUrl = ((profileConfig && profileConfig.videoUrl !== undefined)
+    ? profileConfig.videoUrl
+    : ALBUM_CONFIG.videoUrl || '').trim();
+
+  // Dynamiczna aktualizacja tytułu i podtytułu filmu w zależności od profilu
+  const videoTitleEl = document.querySelector('.video-title');
+  const videoSubtitleEl = document.querySelector('.video-subtitle');
+  if (profileConfig) {
+    if (videoTitleEl && profileConfig.videoTitle) videoTitleEl.textContent = profileConfig.videoTitle;
+    if (videoSubtitleEl && profileConfig.videoSubtitle) videoSubtitleEl.textContent = profileConfig.videoSubtitle;
+  }
+
+  // Jeśli brak linku do filmu dla tego profilu, ukrywamy sekcję i przycisk w Hero
   if (!rawUrl) {
     section.style.display = 'none';
     if (heroBtn) heroBtn.style.display = 'none';
